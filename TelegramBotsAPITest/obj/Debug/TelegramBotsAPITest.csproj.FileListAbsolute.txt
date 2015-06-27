@@ -1,0 +1,12 @@
+C:\Users\Jesús\documents\visual studio 2013\Projects\TelegramBotsAPI\TelegramBotsAPITest\bin\Debug\TelegramBotsAPITest.exe
+C:\Users\Jesús\documents\visual studio 2013\Projects\TelegramBotsAPI\TelegramBotsAPITest\bin\Debug\TelegramBotsAPITest.pdb
+C:\Users\Jesús\documents\visual studio 2013\Projects\TelegramBotsAPI\TelegramBotsAPITest\bin\Debug\TelegramBotsAPI.dll
+C:\Users\Jesús\documents\visual studio 2013\Projects\TelegramBotsAPI\TelegramBotsAPITest\bin\Debug\TelegramBotsAPI.pdb
+C:\Users\Jesús\documents\visual studio 2013\Projects\TelegramBotsAPI\TelegramBotsAPITest\obj\Debug\TelegramBotsAPITest.csprojResolveAssemblyReference.cache
+C:\Users\Jesús\documents\visual studio 2013\Projects\TelegramBotsAPI\TelegramBotsAPITest\obj\Debug\TelegramBotsAPITest.exe
+C:\Users\Jesús\documents\visual studio 2013\Projects\TelegramBotsAPI\TelegramBotsAPITest\obj\Debug\TelegramBotsAPITest.pdb
+C:\Users\Jesús\documents\visual studio 2013\Projects\TelegramBotsAPI\TelegramBotsAPITest\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Jesús\Desktop\TelegramBotsAPI\TelegramBotsAPITest\obj\Debug\TelegramBotsAPITest.exe
+C:\Users\Jesús\Desktop\TelegramBotsAPI\TelegramBotsAPITest\obj\Debug\TelegramBotsAPITest.pdb
+C:\Users\Jesús\Documents\Visual Studio 2013\Projects\TelegramBotsDotNet\TelegramBotsAPITest\obj\Debug\TelegramBotsAPITest.exe
+C:\Users\Jesús\Documents\Visual Studio 2013\Projects\TelegramBotsDotNet\TelegramBotsAPITest\obj\Debug\TelegramBotsAPITest.pdb
