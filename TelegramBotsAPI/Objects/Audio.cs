@@ -15,19 +15,23 @@ namespace TelegramBotsAPI
         /// <summary>
         /// Unique identifier for this file.
         /// </summary>
-        public string file_id { get; set; }
+        [JsonProperty("file_id")]
+        public string FileId { get; set; }
         /// <summary>
         /// Duration of the audio in seconds as defined by sender
         /// </summary>
-        public int duration { get; set; }
+        [JsonProperty("duration")]
+        public int Duration { get; set; }
         /// <summary>
         /// Optional. MIME type of the file as defined by sender.
         /// </summary>
-        public string mime_type { get; set; }
+        [JsonProperty("mime_type")]
+        public string MimeType { get; set; }
         /// <summary>
         /// Optional. File size.
         /// </summary>
-        public int file_size { get; set; }
+        [JsonProperty("file_size")]
+        public int FileSize { get; set; }
 
     }
 }

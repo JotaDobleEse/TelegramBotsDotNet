@@ -15,18 +15,22 @@ namespace TelegramBotsAPI
         /// <summary>
         /// Unique identifier for this file.
         /// </summary>
-        public string file_id { get; set; }
+        [JsonProperty("file_id")]
+        public string FileId { get; set; }
         /// <summary>
         /// Photo width.
         /// </summary>
-        public int width { get; set; }
+        [JsonProperty("width")]
+        public int Width { get; set; }
         /// <summary>
         /// Photo height.
         /// </summary>
-        public int height { get; set; }
+        [JsonProperty("height")]
+        public int Height { get; set; }
         /// <summary>
         /// Optional. File size.
         /// </summary>
-        public int file_size { get; set; }
+        [JsonProperty("file_size")]
+        public int FileSize { get; set; }
     }
 }

@@ -15,10 +15,12 @@ namespace TelegramBotsAPI
         /// <summary>
         /// Longitude as defined by sender.
         /// </summary>
-        public float longitude { get; set; }
+        [JsonProperty("longitude")]
+        public float Longitude { get; set; }
         /// <summary>
         /// Latitude as defined by sender.
         /// </summary>
-        public float latitude { get; set; }
+        [JsonProperty("latitude")]
+        public float Latitude { get; set; }
     }
 }

@@ -16,19 +16,23 @@ namespace TelegramBotsAPI
         /// <summary>
         /// Unique identifier for this user or bot.
         /// </summary>
-        public int id { get; set; }
+        [JsonProperty("id")]
+        public int Id { get; set; }
         /// <summary>
         /// User‘s or bot’s first name.
         /// </summary>
-        public string first_name { get; set; }
+        [JsonProperty("first_name")]
+        public string FirstName { get; set; }
         /// <summary>
         /// Optional. User‘s or bot’s last name.
         /// </summary>
-        public string last_name { get; set; }
+        [JsonProperty("last_name")]
+        public string LastName { get; set; }
         /// <summary>
         /// Optional. User‘s or bot’s username.
         /// </summary>
-        public string username { get; set; }
+        [JsonProperty("username")]
+        public string Username { get; set; }
     }
 
 

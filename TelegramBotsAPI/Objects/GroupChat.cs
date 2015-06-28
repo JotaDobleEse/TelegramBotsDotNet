@@ -16,11 +16,13 @@ namespace TelegramBotsAPI
         /// <summary>
         /// Unique identifier for this group chat.
         /// </summary>
-        public int id { get; set; }
+        [JsonProperty("id")]
+        public int Id { get; set; }
         /// <summary>
         /// Group name.
         /// </summary>
-        public string title { get; set; }
+        [JsonProperty("title")]
+        public string Title { get; set; }
 
     }
 }

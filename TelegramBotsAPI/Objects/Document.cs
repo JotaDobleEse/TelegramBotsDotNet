@@ -15,23 +15,28 @@ namespace TelegramBotsAPI
         /// <summary>
         /// Unique file identifier.
         /// </summary>
-        public string file_id { get; set; }
+        [JsonProperty("file_id")]
+        public string FileId { get; set; }
         /// <summary>
         /// Document thumbnail as defined by sender.
         /// </summary>
-        public PhotoSize thumb { get; set; }
+        [JsonProperty("thumb")]
+        public PhotoSize Thumb { get; set; }
         /// <summary>
         /// Optional. Original filename as defined by sender.
         /// </summary>
-        public string file_name { get; set; }
+        [JsonProperty("file_name")]
+        public string FileName { get; set; }
         /// <summary>
         /// Optional. MIME type of the file as defined by sender.
         /// </summary>
-        public string mime_type { get; set; }
+        [JsonProperty("mime_type")]
+        public string MimeType { get; set; }
         /// <summary>
         /// Optional. File size.
         /// </summary>
-        public int file_size { get; set; }
+        [JsonProperty("file_size")]
+        public int FileSize { get; set; }
 
     }
 }

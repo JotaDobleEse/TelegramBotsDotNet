@@ -16,10 +16,12 @@ namespace TelegramBotsAPI
         /// <summary>
         /// Total number of profile pictures the target user has.
         /// </summary>
-        public int total_count { get; set; }
+        [JsonProperty("total_count")]
+        public int TotalCount { get; set; }
         /// <summary>
         /// Requested profile pictures (in up to 4 sizes each).
         /// </summary>
-        public PhotoSize[] photos { get; set; }
+        [JsonProperty("photos")]
+        public PhotoSize[] Photos { get; set; }
     }
 }

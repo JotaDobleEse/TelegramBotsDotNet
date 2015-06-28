@@ -15,22 +15,27 @@ namespace TelegramBotsAPI
         /// <summary>
         /// Unique identifier for this file.
         /// </summary>
-        public string file_id { get; set; }
+        [JsonProperty("file_id")]
+        public string FileId { get; set; }
         /// <summary>
         /// Sticker width.
         /// </summary>
-        public int width { get; set; }
+        [JsonProperty("width")]
+        public int Width { get; set; }
         /// <summary>
         /// Sticker height.
         /// </summary>
-        public int height { get; set; }
+        [JsonProperty("height")]
+        public int Height { get; set; }
         /// <summary>
         /// Sticker thumbnail in .webp or .jpg format.
         /// </summary>
-        public PhotoSize thumb { get; set; }
+        [JsonProperty("thumb")]
+        public PhotoSize Thumb { get; set; }
         /// <summary>
         /// Optional. File size.
         /// </summary>
-        public int file_size { get; set; }
+        [JsonProperty("file_size")]
+        public int FileSize { get; set; }
     }
 }
