@@ -86,7 +86,7 @@ namespace TelegramBotsAPI
                     Console.WriteLine(e.Message);
                 }
             }
-            return new Message();
+            return null;
         }
 
         /// <summary>
@@ -100,31 +100,36 @@ namespace TelegramBotsAPI
         /// <returns></returns>
         public Message SendMessage2(int chat_id, string text, bool disable_web_page_preview = false, int reply_to_message_id = -1, ReplyKeyboardMarkup reply_markup = null)
         {
-
-            var request = (HttpWebRequest)WebRequest.Create(BaseUrl + "sendMessage");
-            JObject body = new JObject();
-            body.Add("chat_id", JToken.FromObject(chat_id));
-            body.Add("text", JToken.FromObject(text));
-            body.Add("disable_web_page_preview", JToken.FromObject(disable_web_page_preview));
+            string url = BaseUrl + "sendMessage?text=" + text + "&chat_id=" + chat_id;
+            if (disable_web_page_preview)
+                url += "&disable_web_page_preview=true";
             if (reply_to_message_id != -1)
-                body.Add("reply_to_message_id", JToken.FromObject(reply_to_message_id));
+                url += "&reply_to_message_id=" + reply_to_message_id;
             if (reply_markup != null)
-                body.Add("reply_markup", JToken.FromObject(reply_markup));
+                url += "&reply_markup=" + JsonConvert.SerializeObject(reply_markup, Formatting.None);
 
-            Console.WriteLine(body.ToString());
+            Console.WriteLine(url);
 
-            //var response = (HttpWebResponse)request.GetResponse();
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "POST";
 
-            //var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            var response = (HttpWebResponse)request.GetResponse();
 
-            //Console.WriteLine(responseString);
-
-            //JObject json = JObject.Parse(responseString);
-            //if (json.GetValue("ok").ToString() == "true")
-            //{
-            //    var message = JsonConvert.DeserializeObject<Message>(json.GetValue("result").ToString());
-            //    return message;
-            //}
+            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            JObject json = JObject.Parse(responseString);
+            Console.WriteLine(json.ToString());
+            if (json.GetValue("ok").ToString().ToLower() == "true")
+            {
+                try
+                {
+                    Message message = JsonConvert.DeserializeObject<Message>(json.GetValue("result").ToString());
+                    return message;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
             return null;
         }
 
@@ -140,6 +145,36 @@ namespace TelegramBotsAPI
         /// <returns></returns>
         public Message SendMessage3(int chat_id, string text, bool disable_web_page_preview = false, int reply_to_message_id = -1, ReplyKeyboardHide reply_markup = null)
         {
+            string url = BaseUrl + "sendMessage?text=" + text + "&chat_id=" + chat_id;
+            if (disable_web_page_preview)
+                url += "&disable_web_page_preview=true";
+            if (reply_to_message_id != -1)
+                url += "&reply_to_message_id=" + reply_to_message_id;
+            if (reply_markup != null)
+                url += "&reply_markup=" + JsonConvert.SerializeObject(reply_markup, Formatting.None);
+
+            Console.WriteLine(url);
+
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "POST";
+
+            var response = (HttpWebResponse)request.GetResponse();
+
+            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            JObject json = JObject.Parse(responseString);
+            Console.WriteLine(json.ToString());
+            if (json.GetValue("ok").ToString().ToLower() == "true")
+            {
+                try
+                {
+                    Message message = JsonConvert.DeserializeObject<Message>(json.GetValue("result").ToString());
+                    return message;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
             return null;
         }
 
