@@ -11,11 +11,12 @@ namespace TelegramBotsAPI
     /// This object represents a message.
     /// </summary>
     [JsonObject()]
-    public abstract class Message
+    public class Message
     {
         /// <summary>
         /// Unique message identifier.
         /// </summary>
+        [JsonProperty("message_id")]
         public int message_id { get; set; }
         /// <summary>
         /// Sender.
@@ -23,8 +24,14 @@ namespace TelegramBotsAPI
         [JsonProperty("from")]
         public User from { get; set; }
         /// <summary>
+        /// Conversation the message belongs to — user in case of a private message, GroupChat in case of a group.
+        /// </summary>
+        [JsonProperty("chat")]
+        public GroupChat chat { get; set; }
+        /// <summary>
         /// Date the message was sent in Unix time.
         /// </summary>
+        [JsonProperty("date")]
         public int date { get; set; }
         /// <summary>
         /// Optional. For forwarded messages, sender of the original message.
@@ -34,6 +41,7 @@ namespace TelegramBotsAPI
         /// <summary>
         /// Optional. For forwarded messages, date the original message was sent in Unix time.
         /// </summary>
+        [JsonProperty("forward_date")]
         public int forward_date { get; set; }
         /// <summary>
         /// Optional. For replies, the original message. Note that the Message object in this field will not contain further reply_to_message fields even if it itself is a reply.
@@ -43,6 +51,7 @@ namespace TelegramBotsAPI
         /// <summary>
         /// Optional. For text messages, the actual UTF-8 text of the message.
         /// </summary>
+        [JsonProperty("text")]
         public string text { get; set; }
         /// <summary>
         /// Optional. Message is an audio file, information about the file.
@@ -92,6 +101,7 @@ namespace TelegramBotsAPI
         /// <summary>
         /// Optional. A group title was changed to this value.
         /// </summary>
+        [JsonProperty("new_chat_title")]
         public string new_chat_title { get; set; }
         /// <summary>
         /// Optional. A group photo was change to this value.
@@ -101,10 +111,12 @@ namespace TelegramBotsAPI
         /// <summary>
         /// Optional. Informs that the group photo was deleted.
         /// </summary>
+        [JsonProperty("delete_chat_photo")]
         public bool delete_chat_photo { get; set; }
         /// <summary>
         /// Optional. Informs that the group has been created.
         /// </summary>
+        [JsonProperty("group_chat_created")]
         public bool group_chat_created { get; set; }
 
     }

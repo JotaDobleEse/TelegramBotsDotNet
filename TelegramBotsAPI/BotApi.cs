@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Runtime.Serialization;
 
 namespace TelegramBotsAPI
 {
@@ -40,7 +41,7 @@ namespace TelegramBotsAPI
             Console.WriteLine(responseString);
 
             JObject json = JObject.Parse(responseString);
-            if (json.GetValue("ok").ToString() == "true")
+            if (json.GetValue("ok").ToString().ToLower() == "true")
             {
                 var user = JsonConvert.DeserializeObject<User>(json.GetValue("result").ToString());
                 return user;
@@ -71,14 +72,21 @@ namespace TelegramBotsAPI
             var response = (HttpWebResponse)request.GetResponse();
 
             var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            Console.WriteLine(responseString);
             JObject json = JObject.Parse(responseString);
-            if (json.GetValue("ok").ToString() == "true")
+            Console.WriteLine(json.ToString());
+            if (json.GetValue("ok").ToString().ToLower() == "true")
             {
-                var message = JsonConvert.DeserializeObject<Message>(json.GetValue("result").ToString());
-                return message;
+                try
+                {
+                    Message message = JsonConvert.DeserializeObject<Message>(json.GetValue("result").ToString());
+                    return message;
+                } 
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
-            return null;
+            return new Message();
         }
 
         /// <summary>
