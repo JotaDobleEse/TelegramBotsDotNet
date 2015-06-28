@@ -8,3 +8,4 @@ C:\Users\Jesús\Source\Repos\TelegramBotsDotNet\TelegramBotsAPI\bin\Debug\Telegr
 C:\Users\Jesús\Source\Repos\TelegramBotsDotNet\TelegramBotsAPI\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Jesús\Source\Repos\TelegramBotsDotNet\TelegramBotsAPI\obj\Debug\TelegramBotsAPI.dll
 C:\Users\Jesús\Source\Repos\TelegramBotsDotNet\TelegramBotsAPI\obj\Debug\TelegramBotsAPI.pdb
+C:\Users\Jesús\Source\Repos\TelegramBotsDotNet\TelegramBotsAPI\obj\Debug\TelegramBotsAPI.csprojResolveAssemblyReference.cache
