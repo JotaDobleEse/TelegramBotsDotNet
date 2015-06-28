@@ -49,6 +49,8 @@
     <Compile Include="Objects\GroupChat.cs" />
     <Compile Include="Objects\Location.cs" />
     <Compile Include="Objects\Message.cs" />
+    <Compile Include="Objects\MessageGroup.cs" />
+    <Compile Include="Objects\MessageUser.cs" />
     <Compile Include="Objects\PhotoSize.cs" />
     <Compile Include="Objects\ReplyKeyboardHide.cs" />
     <Compile Include="Objects\ReplyKeyboardMarkup.cs" />

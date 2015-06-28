@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace TelegramBotsAPI
     /// <summary>
     /// This object represents an audio file (voice note).
     /// </summary>
+    [JsonObject()]
     public class Audio
     {
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace TelegramBotsAPI
     /// <summary>
     /// This object represents one size of a photo or a file / sticker thumbnail.
     /// </summary>
+    [JsonObject()]
     public class PhotoSize
     {
         /// <summary>

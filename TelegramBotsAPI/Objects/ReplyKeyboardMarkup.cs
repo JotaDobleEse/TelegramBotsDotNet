@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace TelegramBotsAPI
     /// <summary>
     /// This object represents a custom keyboard with reply options (see Introduction to bots for details and examples).
     /// </summary>
+    [JsonObject()]
     public class ReplyKeyboardMarkup
     {
         /// <summary>

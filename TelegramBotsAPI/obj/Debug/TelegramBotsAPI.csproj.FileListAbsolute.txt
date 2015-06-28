@@ -3,3 +3,8 @@ C:\Users\Jesús\documents\visual studio 2013\Projects\TelegramBotsAPI\TelegramBo
 C:\Users\Jesús\documents\visual studio 2013\Projects\TelegramBotsAPI\TelegramBotsAPI\obj\Debug\TelegramBotsAPI.dll
 C:\Users\Jesús\documents\visual studio 2013\Projects\TelegramBotsAPI\TelegramBotsAPI\obj\Debug\TelegramBotsAPI.pdb
 C:\Users\Jesús\documents\visual studio 2013\Projects\TelegramBotsAPI\TelegramBotsAPI\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Jesús\Source\Repos\TelegramBotsDotNet\TelegramBotsAPI\bin\Debug\TelegramBotsAPI.dll
+C:\Users\Jesús\Source\Repos\TelegramBotsDotNet\TelegramBotsAPI\bin\Debug\TelegramBotsAPI.pdb
+C:\Users\Jesús\Source\Repos\TelegramBotsDotNet\TelegramBotsAPI\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Jesús\Source\Repos\TelegramBotsDotNet\TelegramBotsAPI\obj\Debug\TelegramBotsAPI.dll
+C:\Users\Jesús\Source\Repos\TelegramBotsDotNet\TelegramBotsAPI\obj\Debug\TelegramBotsAPI.pdb

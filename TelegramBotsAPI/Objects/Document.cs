@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace TelegramBotsAPI
     /// <summary>
     /// This object represents a general file (as opposed to photos and audio files). Telegram users can send files of any type of up to 1.5 GB in size.
     /// </summary>
+    [JsonObject()]
     public class Document
     {
         /// <summary>

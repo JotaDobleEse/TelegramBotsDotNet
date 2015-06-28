@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace TelegramBotsAPI
     /// <summary>
     /// This object represent a user's profile pictures.
     /// </summary>
+    [JsonObject()]
     public class UserProfilePhotos
     {
         /// <summary>
