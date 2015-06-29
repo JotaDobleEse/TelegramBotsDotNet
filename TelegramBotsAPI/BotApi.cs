@@ -18,6 +18,11 @@ namespace TelegramBotsAPI
     {
         Photo, Audio, Document, Sticker, Video
     }
+    public enum ChatActions
+    {
+        Typing, Upload_photo, Record_video, Upload_video, Record_audio, Upload_audio, Upload_document, Find_location
+    }
+
     public class BotApi
     {
         public string Token { get; private set; }
@@ -1008,6 +1013,154 @@ namespace TelegramBotsAPI
             return ParseResponseMessage(responseString);
         }
         #endregion
+
+        #region SendLocation
+        /// <summary>
+        /// Use this method to send point on the map. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="latitud">Latitude of location.</param>
+        /// <param name="longitud">Longitude of location.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendLocation(int chat_id, float latitud, float longitud, int reply_to_message_id = -1)
+        {
+            string url = BaseUrl + "sendLocation?chat_id=" + chat_id + "&latitud=" + latitud + "&longitud=" + longitud;
+            if (reply_to_message_id != -1)
+                url += "&reply_to_message_id=" + reply_to_message_id;
+
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "POST";
+
+            var response = (HttpWebResponse)request.GetResponse();
+            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            return ParseResponseMessage(responseString);
+        }
+
+        /// <summary>
+        /// Use this method to send point on the map. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="latitud">Latitude of location.</param>
+        /// <param name="longitud">Longitude of location.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendLocation(int chat_id, float latitud, float longitud, ReplyKeyboardMarkup reply_markup, int reply_to_message_id = -1)
+        {
+            string url = BaseUrl + "sendLocation?chat_id=" + chat_id + "&latitud=" + latitud + "&longitud=" + longitud;
+            if (reply_to_message_id != -1)
+                url += "&reply_to_message_id=" + reply_to_message_id;
+            if (reply_markup != null)
+                url += "&reply_markup=" + JsonConvert.SerializeObject(reply_markup, Formatting.None);
+
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "POST";
+
+            var response = (HttpWebResponse)request.GetResponse();
+            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            return ParseResponseMessage(responseString);
+        }
+
+        /// <summary>
+        /// Use this method to send point on the map. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="latitud">Latitude of location.</param>
+        /// <param name="longitud">Longitude of location.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendLocation(int chat_id, float latitud, float longitud, ReplyKeyboardHide reply_markup, int reply_to_message_id = -1)
+        {
+            string url = BaseUrl + "sendLocation?chat_id=" + chat_id + "&latitud=" + latitud + "&longitud=" + longitud;
+            if (reply_to_message_id != -1)
+                url += "&reply_to_message_id=" + reply_to_message_id;
+            if (reply_markup != null)
+                url += "&reply_markup=" + JsonConvert.SerializeObject(reply_markup, Formatting.None);
+
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "POST";
+
+            var response = (HttpWebResponse)request.GetResponse();
+            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            return ParseResponseMessage(responseString);
+        }
+
+        /// <summary>
+        /// Use this method to send point on the map. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="latitud">Latitude of location.</param>
+        /// <param name="longitud">Longitude of location.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendLocation(int chat_id, float latitud, float longitud, ForceReply reply_markup, int reply_to_message_id = -1)
+        {
+            string url = BaseUrl + "sendLocation?chat_id=" + chat_id + "&latitud=" + latitud + "&longitud=" + longitud;
+            if (reply_to_message_id != -1)
+                url += "&reply_to_message_id=" + reply_to_message_id;
+            if (reply_markup != null)
+                url += "&reply_markup=" + JsonConvert.SerializeObject(reply_markup, Formatting.None);
+
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "POST";
+
+            var response = (HttpWebResponse)request.GetResponse();
+            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            return ParseResponseMessage(responseString);
+        }
+        #endregion
+
+        /// <summary>
+        /// Use this method when you need to tell the user that something is happening on the bot's side. The status is set for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).
+        /// We only recommend using this method when a response from the bot will take a noticeable amount of time to arrive.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="action">Type of action to broadcast. Choose one, depending on what the user is about to receive: typing for text messages, upload_photo for photos, record_video or upload_video for videos, record_audio or upload_audio for audio files, upload_document for general files, find_location for location data.</param>
+        public void SendChatAction(int chat_id, ChatActions action)
+        {
+            string url = BaseUrl + "sendChatAction?chat_id=" + chat_id + "&action=" + action.ToString().ToLower();
+
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "POST";
+
+            var response = (HttpWebResponse)request.GetResponse();
+        }
+
+        public UserProfilePhotos GetUserProfilePhotos(int user_id, int offset = -1, int limit = 100)
+        {
+            if (limit > 100 || limit < 1)
+                throw new ArgumentOutOfRangeException("limit", limit, "limit value should be between 1 and 100");
+
+            string url = BaseUrl + "getUserProfilePhotos?user_id=" + user_id;
+            if (offset != -1)
+                url += "&offset=" + offset;
+            if (limit != 100)
+                url += "&limit=" + limit;
+
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "GET";
+
+            var response = (HttpWebResponse)request.GetResponse();
+            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            JObject json = JObject.Parse(responseString);
+            Console.WriteLine(json.ToString());
+            if (json.GetValue("ok").ToString().ToLower() == "true")
+            {
+                try
+                {
+                    var userProfilePhotos = JsonConvert.DeserializeObject<UserProfilePhotos>(json.GetValue("result").ToString());
+                    return userProfilePhotos;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            return null;
+        }
 
         private Message ParseResponseMessage(string response)
         {

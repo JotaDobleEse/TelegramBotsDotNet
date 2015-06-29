@@ -22,6 +22,6 @@ namespace TelegramBotsAPI
         /// Requested profile pictures (in up to 4 sizes each).
         /// </summary>
         [JsonProperty("photos")]
-        public PhotoSize[] Photos { get; set; }
+        public PhotoSize[][] Photos { get; set; }
     }
 }
