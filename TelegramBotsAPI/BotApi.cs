@@ -9,6 +9,8 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
+using System.Security.Cryptography.X509Certificates;
 
 namespace TelegramBotsAPI
 {
@@ -257,23 +259,31 @@ namespace TelegramBotsAPI
         /// <returns></returns>
         public Message SendPhoto(int chat_id, string photo_path, string caption = null, int reply_to_message_id = -1)
         {
-            string url = BaseUrl + "sendPhoto?chat_id=" + chat_id;// +"&photo=" + photo_path;
-            if (!string.IsNullOrEmpty(caption))
-                url += "&caption=" + caption;
-            if (reply_to_message_id != -1)
-                url += "&reply_to_message_id=" + reply_to_message_id;
+            string url = BaseUrl + "sendPhoto";
 
-            byte[] file = File.ReadAllBytes(photo_path);
+            byte[] file = null;
+            using (var content = new MultipartFormDataContent("-------BotAPIDotNET"))
+            {
+                content.Add(new StringContent(string.Format("{0}", chat_id)), "chat_id");
+                var fileStream = File.Open(photo_path, FileMode.Open, FileAccess.Read);
+                content.Add(new StreamContent(fileStream), "photo", photo_path.Replace("\\", "/").Split('/').LastOrDefault());
+                if (!string.IsNullOrEmpty(caption))
+                    content.Add(new StringContent(caption), "caption");
+                if (reply_to_message_id != -1)
+                    content.Add(new StringContent(string.Format("{0}", reply_to_message_id)), "reply_to_message_id");
+
+                Stream multipart = content.ReadAsStreamAsync().Result;
+                file = new byte[multipart.Length];
+                multipart.Seek(0, SeekOrigin.Begin);
+                multipart.Read(file, 0, (int)multipart.Length);
+            }
 
             var request = (HttpWebRequest)WebRequest.Create(url);
-            request.Headers.Add("Enctype: multipart/form-data");
+            request.ContentType = "multipart/form-data; boundary=\"-------BotAPIDotNET\"";
             request.Method = "POST";
-
 
             using(Stream writer = request.GetRequestStream())
             {
-                byte[] encode = Encoding.UTF8.GetBytes("photo=");
-                writer.Write(encode, 0, encode.Length);
                 writer.Write(file, 0, file.Length);
             }
 
