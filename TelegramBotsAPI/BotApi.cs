@@ -14,6 +14,10 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace TelegramBotsAPI
 {
+    public enum MultimediaType
+    {
+        Photo, Audio, Document, Sticker, Video
+    }
     public class BotApi
     {
         public string Token { get; private set; }
@@ -46,6 +50,7 @@ namespace TelegramBotsAPI
             return null;
         }
 
+        #region SendMessage
         /// <summary>
         /// Use this method to send text messages. On success, the sent Message is returned.
         /// </summary>
@@ -159,6 +164,7 @@ namespace TelegramBotsAPI
             var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
             return ParseResponseMessage(responseString);
         }
+        #endregion
 
         /// <summary>
         /// Use this method to forward messages of any kind. On success, the sent Message is returned.
@@ -179,6 +185,7 @@ namespace TelegramBotsAPI
             return ParseResponseMessage(responseString);
         }
 
+        #region SendPhoto
         /// <summary>
         /// Use this method to send photos. On success, the sent Message is returned.
         /// </summary>
@@ -189,37 +196,7 @@ namespace TelegramBotsAPI
         /// <returns></returns>
         public Message SendPhoto(int chat_id, string photo_path, string caption = null, int reply_to_message_id = -1)
         {
-            string url = BaseUrl + "sendPhoto";
-
-            byte[] file = null;
-            using (var content = new MultipartFormDataContent("-------BotAPIDotNET"))
-            {
-                content.Add(new StringContent(string.Format("{0}", chat_id)), "chat_id");
-                var fileStream = File.Open(photo_path, FileMode.Open, FileAccess.Read);
-                content.Add(new StreamContent(fileStream), "photo", photo_path.Replace("\\", "/").Split('/').LastOrDefault());
-                if (!string.IsNullOrEmpty(caption))
-                    content.Add(new StringContent(caption), "caption");
-                if (reply_to_message_id != -1)
-                    content.Add(new StringContent(string.Format("{0}", reply_to_message_id)), "reply_to_message_id");
-
-                Stream multipart = content.ReadAsStreamAsync().Result;
-                file = new byte[multipart.Length];
-                multipart.Seek(0, SeekOrigin.Begin);
-                multipart.Read(file, 0, (int)multipart.Length);
-            }
-
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            request.ContentType = "multipart/form-data; boundary=\"-------BotAPIDotNET\"";
-            request.Method = "POST";
-
-            using(Stream writer = request.GetRequestStream())
-            {
-                writer.Write(file, 0, file.Length);
-            }
-
-            var response = (HttpWebResponse)request.GetResponse();
-            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            return ParseResponseMessage(responseString);
+            return SendMultimedia(chat_id, photo_path, MultimediaType.Photo, caption, reply_to_message_id);
         }
 
         /// <summary>
@@ -233,39 +210,7 @@ namespace TelegramBotsAPI
         /// <returns></returns>
         public Message SendPhoto(int chat_id, string photo_path, ReplyKeyboardMarkup reply_markup, string caption = null, int reply_to_message_id = -1)
         {
-            string url = BaseUrl + "sendPhoto";
-
-            byte[] file = null;
-            using (var content = new MultipartFormDataContent("-------BotAPIDotNET"))
-            {
-                content.Add(new StringContent(string.Format("{0}", chat_id)), "chat_id");
-                var fileStream = File.Open(photo_path, FileMode.Open, FileAccess.Read);
-                content.Add(new StreamContent(fileStream), "photo", photo_path.Replace("\\", "/").Split('/').LastOrDefault());
-                if (!string.IsNullOrEmpty(caption))
-                    content.Add(new StringContent(caption), "caption");
-                if (reply_to_message_id != -1)
-                    content.Add(new StringContent(string.Format("{0}", reply_to_message_id)), "reply_to_message_id");
-                if (reply_markup != null)
-                    content.Add(new StringContent(JsonConvert.SerializeObject(reply_markup, Formatting.None)), "reply_markup");
-
-                Stream multipart = content.ReadAsStreamAsync().Result;
-                file = new byte[multipart.Length];
-                multipart.Seek(0, SeekOrigin.Begin);
-                multipart.Read(file, 0, (int)multipart.Length);
-            }
-
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            request.ContentType = "multipart/form-data; boundary=\"-------BotAPIDotNET\"";
-            request.Method = "POST";
-
-            using (Stream writer = request.GetRequestStream())
-            {
-                writer.Write(file, 0, file.Length);
-            }
-
-            var response = (HttpWebResponse)request.GetResponse();
-            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            return ParseResponseMessage(responseString);
+            return SendMultimedia(chat_id, photo_path, MultimediaType.Photo, reply_markup, caption, reply_to_message_id);
         }
 
         /// <summary>
@@ -279,39 +224,7 @@ namespace TelegramBotsAPI
         /// <returns></returns>
         public Message SendPhoto(int chat_id, string photo_path, ReplyKeyboardHide reply_markup, string caption = null, int reply_to_message_id = -1)
         {
-            string url = BaseUrl + "sendPhoto";
-
-            byte[] file = null;
-            using (var content = new MultipartFormDataContent("-------BotAPIDotNET"))
-            {
-                content.Add(new StringContent(string.Format("{0}", chat_id)), "chat_id");
-                var fileStream = File.Open(photo_path, FileMode.Open, FileAccess.Read);
-                content.Add(new StreamContent(fileStream), "photo", photo_path.Replace("\\", "/").Split('/').LastOrDefault());
-                if (!string.IsNullOrEmpty(caption))
-                    content.Add(new StringContent(caption), "caption");
-                if (reply_to_message_id != -1)
-                    content.Add(new StringContent(string.Format("{0}", reply_to_message_id)), "reply_to_message_id");
-                if (reply_markup != null)
-                    content.Add(new StringContent(JsonConvert.SerializeObject(reply_markup, Formatting.None)), "reply_markup");
-
-                Stream multipart = content.ReadAsStreamAsync().Result;
-                file = new byte[multipart.Length];
-                multipart.Seek(0, SeekOrigin.Begin);
-                multipart.Read(file, 0, (int)multipart.Length);
-            }
-
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            request.ContentType = "multipart/form-data; boundary=\"-------BotAPIDotNET\"";
-            request.Method = "POST";
-
-            using (Stream writer = request.GetRequestStream())
-            {
-                writer.Write(file, 0, file.Length);
-            }
-
-            var response = (HttpWebResponse)request.GetResponse();
-            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            return ParseResponseMessage(responseString);
+            return SendMultimedia(chat_id, photo_path, MultimediaType.Photo, reply_markup, caption, reply_to_message_id);
         }
 
         /// <summary>
@@ -325,15 +238,547 @@ namespace TelegramBotsAPI
         /// <returns></returns>
         public Message SendPhoto(int chat_id, string photo_path, ForceReply reply_markup, string caption = null, int reply_to_message_id = -1)
         {
-            string url = BaseUrl + "sendPhoto";
+            return SendMultimedia(chat_id, photo_path, MultimediaType.Photo, reply_markup, caption, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send photos. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="photo_id">Photo to send. You can pass a file_id as String to resend a photo that is already on the Telegram servers.</param>
+        /// <param name="caption">Photo caption (may also be used when resending photos by file_id).</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendPhoto(int chat_id, string photo_id, string caption = null, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, photo_id, MultimediaType.Photo, caption, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send photos. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="photo_id">Photo to send. You can pass a file_id as String to resend a photo that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="caption">Photo caption (may also be used when resending photos by file_id).</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendPhoto(int chat_id, string photo_id, ReplyKeyboardMarkup reply_markup, string caption = null, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, photo_id, MultimediaType.Photo, reply_markup, caption, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send photos. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="photo_id">Photo to send. You can pass a file_id as String to resend a photo that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="caption">Photo caption (may also be used when resending photos by file_id).</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendPhoto(int chat_id, string photo_id, ReplyKeyboardHide reply_markup, string caption = null, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, photo_id, MultimediaType.Photo, reply_markup, caption, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send photos. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="photo_id">Photo to send. You can pass a file_id as String to resend a photo that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="caption">Photo caption (may also be used when resending photos by file_id).</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendPhoto(int chat_id, string photo_id, ForceReply reply_markup, string caption = null, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, photo_id, MultimediaType.Photo, reply_markup, caption, reply_to_message_id);
+        }
+        #endregion
+
+        #region SendAudio
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="audio_path">Audio file to send. You can upload a new audio file using multipart/form-data.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendAudio(int chat_id, string audio_path, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, audio_path, MultimediaType.Audio, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="audio_path">Audio file to send. You can upload a new audio file using multipart/form-data.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendAudio(int chat_id, string audio_path, ReplyKeyboardMarkup reply_markup, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, audio_path, MultimediaType.Audio, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="audio_path">Audio file to send. You can upload a new audio file using multipart/form-data.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendAudio(int chat_id, string audio_path, ReplyKeyboardHide reply_markup, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, audio_path, MultimediaType.Audio, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="audio_path">Audio file to send. You can upload a new audio file using multipart/form-data.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendAudio(int chat_id, string audio_path, ForceReply reply_markup, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, audio_path, MultimediaType.Audio, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="audio_id">Audio file to send. You can pass a file_id as String to resend an audio that is already on the Telegram servers.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendAudio(int chat_id, string audio_id, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, audio_id, MultimediaType.Audio, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="audio_id">Audio file to send. You can pass a file_id as String to resend an audio that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendAudio(int chat_id, string audio_id, ReplyKeyboardMarkup reply_markup, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, audio_id, MultimediaType.Audio, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="audio_id">Audio file to send. You can pass a file_id as String to resend an audio that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendAudio(int chat_id, string audio_id, ReplyKeyboardHide reply_markup, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, audio_id, MultimediaType.Audio, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="audio_id">Audio file to send. You can pass a file_id as String to resend an audio that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendAudio(int chat_id, string audio_id, ForceReply reply_markup, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, audio_id, MultimediaType.Audio, reply_markup, null, reply_to_message_id);
+        }
+        #endregion
+
+        #region SendDocument
+        /// <summary>
+        /// Use this method to send general files. On success, the sent Message is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="document_path">File to send. You can upload a new file using multipart/form-data.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendDocument(int chat_id, string document_path, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, document_path, MultimediaType.Document, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send general files. On success, the sent Message is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="document_path">File to send. You can upload a new file using multipart/form-data.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendDocument(int chat_id, string document_path, ReplyKeyboardMarkup reply_markup, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, document_path, MultimediaType.Document, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send general files. On success, the sent Message is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="document_path">File to send. You can upload a new file using multipart/form-data.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendDocument(int chat_id, string document_path, ReplyKeyboardHide reply_markup, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, document_path, MultimediaType.Document, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send general files. On success, the sent Message is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="document_path">File to send. You can upload a new file using multipart/form-data.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendDocument(int chat_id, string document_path, ForceReply reply_markup, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, document_path, MultimediaType.Document, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send general files. On success, the sent Message is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="document_id">File to send. You can pass a file_id as String to resend a file that is already on the Telegram servers.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendDocument(int chat_id, string document_id, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, document_id, MultimediaType.Document, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send general files. On success, the sent Message is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="document_id">File to send. You can pass a file_id as String to resend a file that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendDocument(int chat_id, string document_id, ReplyKeyboardMarkup reply_markup, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, document_id, MultimediaType.Document, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send general files. On success, the sent Message is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="document_id">File to send. You can pass a file_id as String to resend a file that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendDocument(int chat_id, string document_id, ReplyKeyboardHide reply_markup, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, document_id, MultimediaType.Document, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send general files. On success, the sent Message is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="document_id">File to send. You can pass a file_id as String to resend a file that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendDocument(int chat_id, string document_id, ForceReply reply_markup, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, document_id, MultimediaType.Document, reply_markup, null, reply_to_message_id);
+        }
+        #endregion
+
+        #region SendSticker
+        /// <summary>
+        /// Use this method to send .webp stickers. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="sticker_path">Sticker to send. You can upload a new sticker using multipart/form-data.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendSticker(int chat_id, string sticker_path, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, sticker_path, MultimediaType.Sticker, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send .webp stickers. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="sticker_path">Sticker to send. You can upload a new sticker using multipart/form-data.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendSticker(int chat_id, string sticker_path, ReplyKeyboardMarkup reply_markup, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, sticker_path, MultimediaType.Sticker, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send .webp stickers. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="sticker_path">Sticker to send. You can upload a new sticker using multipart/form-data.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendSticker(int chat_id, string sticker_path, ReplyKeyboardHide reply_markup, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, sticker_path, MultimediaType.Sticker, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send .webp stickers. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="sticker_path">Sticker to send. You can upload a new sticker using multipart/form-data.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendSticker(int chat_id, string sticker_path, ForceReply reply_markup, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, sticker_path, MultimediaType.Sticker, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send .webp stickers. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="sticker_id">Sticker to send. You can pass a file_id as String to resend a sticker that is already on the Telegram servers.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendSticker(int chat_id, string sticker_id, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, sticker_id, MultimediaType.Sticker, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send .webp stickers. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="sticker_id">Sticker to send. You can pass a file_id as String to resend a sticker that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendSticker(int chat_id, string sticker_id, ReplyKeyboardMarkup reply_markup, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, sticker_id, MultimediaType.Sticker, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send .webp stickers. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="sticker_id">Sticker to send. You can pass a file_id as String to resend a sticker that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendSticker(int chat_id, string sticker_id, ReplyKeyboardHide reply_markup, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, sticker_id, MultimediaType.Sticker, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send .webp stickers. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="sticker_id">Sticker to send. You can pass a file_id as String to resend a sticker that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendSticker(int chat_id, string sticker_id, ForceReply reply_markup, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, sticker_id, MultimediaType.Sticker, reply_markup, null, reply_to_message_id);
+        }
+        #endregion
+
+        #region SendVideo
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="video_path">Video file to send. You can upload a new video file using multipart/form-data.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendVideo(int chat_id, string video_path, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, video_path, MultimediaType.Video, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="video_path">Video file to send. You can upload a new video file using multipart/form-data.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendVideo(int chat_id, string video_path, ReplyKeyboardMarkup reply_markup, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, video_path, MultimediaType.Video, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="video_path">Video file to send. You can upload a new video file using multipart/form-data.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendVideo(int chat_id, string video_path, ReplyKeyboardHide reply_markup, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, video_path, MultimediaType.Video, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="video_path">Video file to send. You can upload a new video file using multipart/form-data.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendVideo(int chat_id, string video_path, ForceReply reply_markup, int reply_to_message_id = -1)
+        {
+            return SendMultimedia(chat_id, video_path, MultimediaType.Video, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="video_id">Video file to send. You can pass a file_id as String to resend an video that is already on the Telegram servers.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendVideo(int chat_id, string video_id, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, video_id, MultimediaType.Video, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="video_id">Video file to send. You can pass a file_id as String to resend an video that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendVideo(int chat_id, string video_id, ReplyKeyboardMarkup reply_markup, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, video_id, MultimediaType.Video, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="video_id">Video file to send. You can pass a file_id as String to resend an video that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendVideo(int chat_id, string video_id, ReplyKeyboardHide reply_markup, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, video_id, MultimediaType.Video, reply_markup, null, reply_to_message_id);
+        }
+
+        /// <summary>
+        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="video_id">Video file to send. You can pass a file_id as String to resend an video that is already on the Telegram servers.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message ResendVideo(int chat_id, string video_id, ForceReply reply_markup, int reply_to_message_id = -1)
+        {
+            return ResendMultimedia(chat_id, video_id, MultimediaType.Video, reply_markup, null, reply_to_message_id);
+        }
+        #endregion
+
+        #region SendMultimedia
+        /// <summary>
+        /// Use this method to send multimedia files. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="file_path">File to send. You can upload a new file using multipart/form-data.</param>
+        /// <param name="type">Type of file to send.</param>
+        /// <param name="caption">Photo caption (only use with Type.Photo).</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendMultimedia(int chat_id, string file_path, MultimediaType type, string caption = null, int reply_to_message_id = -1)
+        {
+            string url = BaseUrl + "send" + type.ToString();
 
             byte[] file = null;
             using (var content = new MultipartFormDataContent("-------BotAPIDotNET"))
             {
                 content.Add(new StringContent(string.Format("{0}", chat_id)), "chat_id");
-                var fileStream = File.Open(photo_path, FileMode.Open, FileAccess.Read);
-                content.Add(new StreamContent(fileStream), "photo", photo_path.Replace("\\", "/").Split('/').LastOrDefault());
-                if (!string.IsNullOrEmpty(caption))
+                var fileStream = File.Open(file_path, FileMode.Open, FileAccess.Read);
+                content.Add(new StreamContent(fileStream), type.ToString().ToLower(), file_path.Replace("\\", "/").Split('/').LastOrDefault());
+                if (!string.IsNullOrEmpty(caption) && type == MultimediaType.Photo)
+                    content.Add(new StringContent(caption), "caption");
+                if (reply_to_message_id != -1)
+                    content.Add(new StringContent(string.Format("{0}", reply_to_message_id)), "reply_to_message_id");
+
+                Stream multipart = content.ReadAsStreamAsync().Result;
+                file = new byte[multipart.Length];
+                multipart.Seek(0, SeekOrigin.Begin);
+                multipart.Read(file, 0, (int)multipart.Length);
+            }
+
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.ContentType = "multipart/form-data; boundary=\"-------BotAPIDotNET\"";
+            request.Method = "POST";
+
+            using (Stream writer = request.GetRequestStream())
+            {
+                writer.Write(file, 0, file.Length);
+            }
+
+            var response = (HttpWebResponse)request.GetResponse();
+            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            return ParseResponseMessage(responseString);
+        }
+
+        /// <summary>
+        /// Use this method to send multimedia files. On success, the sent Message is returned.
+        /// </summary>
+        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
+        /// <param name="file_path">File to send. You can upload a new file using multipart/form-data.</param>
+        /// <param name="type">Type of file to send.</param>
+        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="caption">Photo caption (only use with Type.Photo).</param>
+        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
+        /// <returns></returns>
+        public Message SendMultimedia(int chat_id, string file_path, MultimediaType type, ReplyKeyboardMarkup reply_markup, string caption = null, int reply_to_message_id = -1)
+        {
+            string url = BaseUrl + "send" + type.ToString();
+
+            byte[] file = null;
+            using (var content = new MultipartFormDataContent("-------BotAPIDotNET"))
+            {
+                content.Add(new StringContent(string.Format("{0}", chat_id)), "chat_id");
+                var fileStream = File.Open(file_path, FileMode.Open, FileAccess.Read);
+                content.Add(new StreamContent(fileStream), type.ToString().ToLower(), file_path.Replace("\\", "/").Split('/').LastOrDefault());
+                if (!string.IsNullOrEmpty(caption) && type == MultimediaType.Photo)
                     content.Add(new StringContent(caption), "caption");
                 if (reply_to_message_id != -1)
                     content.Add(new StringContent(string.Format("{0}", reply_to_message_id)), "reply_to_message_id");
@@ -361,168 +806,27 @@ namespace TelegramBotsAPI
         }
 
         /// <summary>
-        /// Use this method to send photos. On success, the sent Message is returned.
+        /// Use this method to send multimedia files. On success, the sent Message is returned.
         /// </summary>
         /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
-        /// <param name="photo_id">Photo to send. You can pass a file_id as String to resend a photo that is already on the Telegram servers.</param>
-        /// <param name="caption">Photo caption (may also be used when resending photos by file_id).</param>
-        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
-        /// <returns></returns>
-        public Message ResendPhoto(int chat_id, string photo_id, string caption = null, int reply_to_message_id = -1)
-        {
-            string url = BaseUrl + "sendPhoto?chat_id=" + chat_id + "&photo=" + photo_id;
-            if (!string.IsNullOrEmpty(caption))
-                url += "&caption=" + caption;
-            if (reply_to_message_id != -1)
-                url += "&reply_to_message_id=" + reply_to_message_id;
-
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = "POST";
-
-            var response = (HttpWebResponse)request.GetResponse();
-            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            return ParseResponseMessage(responseString);
-        }
-
-        /// <summary>
-        /// Use this method to send photos. On success, the sent Message is returned.
-        /// </summary>
-        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
-        /// <param name="photo_id">Photo to send. You can pass a file_id as String to resend a photo that is already on the Telegram servers.</param>
+        /// <param name="file_path">File to send. You can upload a new file using multipart/form-data.</param>
+        /// <param name="type">Type of file to send.</param>
         /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
-        /// <param name="caption">Photo caption (may also be used when resending photos by file_id).</param>
+        /// <param name="caption">Photo caption (only use with Type.Photo).</param>
         /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
         /// <returns></returns>
-        public Message ResendPhoto(int chat_id, string photo_id, ReplyKeyboardMarkup reply_markup, string caption = null, int reply_to_message_id = -1)
+        public Message SendMultimedia(int chat_id, string file_path, MultimediaType type, ReplyKeyboardHide reply_markup, string caption = null, int reply_to_message_id = -1)
         {
-            string url = BaseUrl + "sendPhoto?chat_id=" + chat_id + "&photo=" + photo_id;
-            if (!string.IsNullOrEmpty(caption))
-                url += "&caption=" + caption;
-            if (reply_to_message_id != -1)
-                url += "&reply_to_message_id=" + reply_to_message_id;
-            if (reply_markup != null)
-                url += "&reply_markup=" + JsonConvert.SerializeObject(reply_markup, Formatting.None);
-
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = "POST";
-
-            var response = (HttpWebResponse)request.GetResponse();
-            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            return ParseResponseMessage(responseString);
-        }
-
-        /// <summary>
-        /// Use this method to send photos. On success, the sent Message is returned.
-        /// </summary>
-        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
-        /// <param name="photo_id">Photo to send. You can pass a file_id as String to resend a photo that is already on the Telegram servers.</param>
-        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
-        /// <param name="caption">Photo caption (may also be used when resending photos by file_id).</param>
-        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
-        /// <returns></returns>
-        public Message ResendPhoto(int chat_id, string photo_id, ReplyKeyboardHide reply_markup, string caption = null, int reply_to_message_id = -1)
-        {
-            string url = BaseUrl + "sendPhoto?chat_id=" + chat_id + "&photo=" + photo_id;
-            if (!string.IsNullOrEmpty(caption))
-                url += "&caption=" + caption;
-            if (reply_to_message_id != -1)
-                url += "&reply_to_message_id=" + reply_to_message_id;
-            if (reply_markup != null)
-                url += "&reply_markup=" + JsonConvert.SerializeObject(reply_markup, Formatting.None);
-
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = "POST";
-
-            var response = (HttpWebResponse)request.GetResponse();
-            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            return ParseResponseMessage(responseString);
-        }
-
-        /// <summary>
-        /// Use this method to send photos. On success, the sent Message is returned.
-        /// </summary>
-        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
-        /// <param name="photo_id">Photo to send. You can pass a file_id as String to resend a photo that is already on the Telegram servers.</param>
-        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
-        /// <param name="caption">Photo caption (may also be used when resending photos by file_id).</param>
-        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
-        /// <returns></returns>
-        public Message ResendPhoto(int chat_id, string photo_id, ForceReply reply_markup, string caption = null, int reply_to_message_id = -1)
-        {
-            string url = BaseUrl + "sendPhoto?chat_id=" + chat_id + "&photo=" + photo_id;
-            if (!string.IsNullOrEmpty(caption))
-                url += "&caption=" + caption;
-            if (reply_to_message_id != -1)
-                url += "&reply_to_message_id=" + reply_to_message_id;
-            if (reply_markup != null)
-                url += "&reply_markup=" + JsonConvert.SerializeObject(reply_markup, Formatting.None);
-
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = "POST";
-
-            var response = (HttpWebResponse)request.GetResponse();
-            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            return ParseResponseMessage(responseString);
-        }
-
-        /// <summary>
-        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
-        /// </summary>
-        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
-        /// <param name="audio_path">Audio file to send. You can upload a new audio file using multipart/form-data.</param>
-        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
-        /// <returns></returns>
-        public Message SendAudio(int chat_id, string audio_path, int reply_to_message_id = -1)
-        {
-            string url = BaseUrl + "sendAudio";
+            string url = BaseUrl + "send" + type.ToString();
 
             byte[] file = null;
             using (var content = new MultipartFormDataContent("-------BotAPIDotNET"))
             {
                 content.Add(new StringContent(string.Format("{0}", chat_id)), "chat_id");
-                var fileStream = File.Open(audio_path, FileMode.Open, FileAccess.Read);
-                content.Add(new StreamContent(fileStream), "audio", audio_path.Replace("\\", "/").Split('/').LastOrDefault());
-                if (reply_to_message_id != -1)
-                    content.Add(new StringContent(string.Format("{0}", reply_to_message_id)), "reply_to_message_id");
-
-                Stream multipart = content.ReadAsStreamAsync().Result;
-                file = new byte[multipart.Length];
-                multipart.Seek(0, SeekOrigin.Begin);
-                multipart.Read(file, 0, (int)multipart.Length);
-            }
-
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            request.ContentType = "multipart/form-data; boundary=\"-------BotAPIDotNET\"";
-            request.Method = "POST";
-
-            using (Stream writer = request.GetRequestStream())
-            {
-                writer.Write(file, 0, file.Length);
-            }
-
-            var response = (HttpWebResponse)request.GetResponse();
-            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            return ParseResponseMessage(responseString);
-        }
-
-        /// <summary>
-        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
-        /// </summary>
-        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
-        /// <param name="audio_path">Audio file to send. You can upload a new audio file using multipart/form-data.</param>
-        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
-        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
-        /// <returns></returns>
-        public Message SendAudio(int chat_id, string audio_path, ReplyKeyboardMarkup reply_markup, int reply_to_message_id = -1)
-        {
-            string url = BaseUrl + "sendAudio";
-
-            byte[] file = null;
-            using (var content = new MultipartFormDataContent("-------BotAPIDotNET"))
-            {
-                content.Add(new StringContent(string.Format("{0}", chat_id)), "chat_id");
-                var fileStream = File.Open(audio_path, FileMode.Open, FileAccess.Read);
-                content.Add(new StreamContent(fileStream), "audio", audio_path.Replace("\\", "/").Split('/').LastOrDefault());
+                var fileStream = File.Open(file_path, FileMode.Open, FileAccess.Read);
+                content.Add(new StreamContent(fileStream), type.ToString().ToLower(), file_path.Replace("\\", "/").Split('/').LastOrDefault());
+                if (!string.IsNullOrEmpty(caption) && type == MultimediaType.Photo)
+                    content.Add(new StringContent(caption), "caption");
                 if (reply_to_message_id != -1)
                     content.Add(new StringContent(string.Format("{0}", reply_to_message_id)), "reply_to_message_id");
                 if (reply_markup != null)
@@ -549,23 +853,27 @@ namespace TelegramBotsAPI
         }
 
         /// <summary>
-        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// Use this method to send multimedia files. On success, the sent Message is returned.
         /// </summary>
         /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
-        /// <param name="audio_path">Audio file to send. You can upload a new audio file using multipart/form-data.</param>
+        /// <param name="file_path">File to send. You can upload a new file using multipart/form-data.</param>
+        /// <param name="type">Type of file to send.</param>
         /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="caption">Photo caption (only use with Type.Photo).</param>
         /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
         /// <returns></returns>
-        public Message SendAudio(int chat_id, string audio_path, ReplyKeyboardHide reply_markup, int reply_to_message_id = -1)
+        public Message SendMultimedia(int chat_id, string file_path, MultimediaType type, ForceReply reply_markup, string caption = null, int reply_to_message_id = -1)
         {
-            string url = BaseUrl + "sendAudio";
+            string url = BaseUrl + "send" + type.ToString();
 
             byte[] file = null;
             using (var content = new MultipartFormDataContent("-------BotAPIDotNET"))
             {
                 content.Add(new StringContent(string.Format("{0}", chat_id)), "chat_id");
-                var fileStream = File.Open(audio_path, FileMode.Open, FileAccess.Read);
-                content.Add(new StreamContent(fileStream), "audio", audio_path.Replace("\\", "/").Split('/').LastOrDefault());
+                var fileStream = File.Open(file_path, FileMode.Open, FileAccess.Read);
+                content.Add(new StreamContent(fileStream), type.ToString().ToLower(), file_path.Replace("\\", "/").Split('/').LastOrDefault());
+                if (!string.IsNullOrEmpty(caption) && type == MultimediaType.Photo)
+                    content.Add(new StringContent(caption), "caption");
                 if (reply_to_message_id != -1)
                     content.Add(new StringContent(string.Format("{0}", reply_to_message_id)), "reply_to_message_id");
                 if (reply_markup != null)
@@ -592,58 +900,19 @@ namespace TelegramBotsAPI
         }
 
         /// <summary>
-        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// Use this method to send multimedia files. On success, the sent Message is returned.
         /// </summary>
         /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
-        /// <param name="audio_path">Audio file to send. You can upload a new audio file using multipart/form-data.</param>
-        /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="photo_id">File to send. You can pass a file_id as String to resend a photo that is already on the Telegram servers.</param>
+        /// <param name="type">Type of file to send.</param>
+        /// <param name="caption">Photo caption (only use with Type.Photo).</param>
         /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
         /// <returns></returns>
-        public Message SendAudio(int chat_id, string audio_path, ForceReply reply_markup, int reply_to_message_id = -1)
+        public Message ResendMultimedia(int chat_id, string photo_id, MultimediaType type, string caption = null, int reply_to_message_id = -1)
         {
-            string url = BaseUrl + "sendAudio";
-
-            byte[] file = null;
-            using (var content = new MultipartFormDataContent("-------BotAPIDotNET"))
-            {
-                content.Add(new StringContent(string.Format("{0}", chat_id)), "chat_id");
-                var fileStream = File.Open(audio_path, FileMode.Open, FileAccess.Read);
-                content.Add(new StreamContent(fileStream), "audio", audio_path.Replace("\\", "/").Split('/').LastOrDefault());
-                if (reply_to_message_id != -1)
-                    content.Add(new StringContent(string.Format("{0}", reply_to_message_id)), "reply_to_message_id");
-                if (reply_markup != null)
-                    content.Add(new StringContent(JsonConvert.SerializeObject(reply_markup, Formatting.None)), "reply_markup");
-
-                Stream multipart = content.ReadAsStreamAsync().Result;
-                file = new byte[multipart.Length];
-                multipart.Seek(0, SeekOrigin.Begin);
-                multipart.Read(file, 0, (int)multipart.Length);
-            }
-
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            request.ContentType = "multipart/form-data; boundary=\"-------BotAPIDotNET\"";
-            request.Method = "POST";
-
-            using (Stream writer = request.GetRequestStream())
-            {
-                writer.Write(file, 0, file.Length);
-            }
-
-            var response = (HttpWebResponse)request.GetResponse();
-            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            return ParseResponseMessage(responseString);
-        }
-
-        /// <summary>
-        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
-        /// </summary>
-        /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
-        /// <param name="audio_id">Audio file to send. You can pass a file_id as String to resend an audio that is already on the Telegram servers.</param>
-        /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
-        /// <returns></returns>
-        public Message ResendAudio(int chat_id, string audio_id, int reply_to_message_id = -1)
-        {
-            string url = BaseUrl + "sendPhoto?chat_id=" + chat_id + "&audio=" + audio_id;
+            string url = BaseUrl + "send" + type.ToString() + "?chat_id=" + chat_id + "&" + type.ToString().ToLower() + "=" + photo_id;
+            if (!string.IsNullOrEmpty(caption) && type == MultimediaType.Photo)
+                url += "&caption=" + caption;
             if (reply_to_message_id != -1)
                 url += "&reply_to_message_id=" + reply_to_message_id;
 
@@ -656,16 +925,20 @@ namespace TelegramBotsAPI
         }
 
         /// <summary>
-        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// Use this method to send multimedia files. On success, the sent Message is returned.
         /// </summary>
         /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
-        /// <param name="audio_id">Audio file to send. You can pass a file_id as String to resend an audio that is already on the Telegram servers.</param>
+        /// <param name="photo_id">File to send. You can pass a file_id as String to resend a photo that is already on the Telegram servers.</param>
+        /// <param name="type">Type of file to send.</param>
         /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="caption">Photo caption (only use with Type.Photo).</param>
         /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
         /// <returns></returns>
-        public Message ResendAudio(int chat_id, string audio_id, ReplyKeyboardMarkup reply_markup, int reply_to_message_id = -1)
+        public Message ResendMultimedia(int chat_id, string photo_id, MultimediaType type, ReplyKeyboardMarkup reply_markup, string caption = null, int reply_to_message_id = -1)
         {
-            string url = BaseUrl + "sendPhoto?chat_id=" + chat_id + "&audio=" + audio_id;
+            string url = BaseUrl + "send" + type.ToString() + "?chat_id=" + chat_id + "&" + type.ToString().ToLower() + "=" + photo_id;
+            if (!string.IsNullOrEmpty(caption) && type == MultimediaType.Photo)
+                url += "&caption=" + caption;
             if (reply_to_message_id != -1)
                 url += "&reply_to_message_id=" + reply_to_message_id;
             if (reply_markup != null)
@@ -680,16 +953,20 @@ namespace TelegramBotsAPI
         }
 
         /// <summary>
-        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// Use this method to send multimedia files. On success, the sent Message is returned.
         /// </summary>
         /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
-        /// <param name="audio_id">Audio file to send. You can pass a file_id as String to resend an audio that is already on the Telegram servers.</param>
+        /// <param name="photo_id">File to send. You can pass a file_id as String to resend a photo that is already on the Telegram servers.</param>
+        /// <param name="type">Type of file to send.</param>
         /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="caption">Photo caption (only use with Type.Photo).</param>
         /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
         /// <returns></returns>
-        public Message ResendAudio(int chat_id, string audio_id, ReplyKeyboardHide reply_markup, int reply_to_message_id = -1)
+        public Message ResendMultimedia(int chat_id, string photo_id, MultimediaType type, ReplyKeyboardHide reply_markup, string caption = null, int reply_to_message_id = -1)
         {
-            string url = BaseUrl + "sendPhoto?chat_id=" + chat_id + "&audio=" + audio_id;
+            string url = BaseUrl + "send" + type.ToString() + "?chat_id=" + chat_id + "&" + type.ToString().ToLower() + "=" + photo_id;
+            if (!string.IsNullOrEmpty(caption) && type == MultimediaType.Photo)
+                url += "&caption=" + caption;
             if (reply_to_message_id != -1)
                 url += "&reply_to_message_id=" + reply_to_message_id;
             if (reply_markup != null)
@@ -704,16 +981,20 @@ namespace TelegramBotsAPI
         }
 
         /// <summary>
-        /// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document). On success, the sent Message is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+        /// Use this method to send multimedia files. On success, the sent Message is returned.
         /// </summary>
         /// <param name="chat_id">Unique identifier for the message recipient — User or GroupChat id.</param>
-        /// <param name="audio_id">Audio file to send. You can pass a file_id as String to resend an audio that is already on the Telegram servers.</param>
+        /// <param name="photo_id">File to send. You can pass a file_id as String to resend a photo that is already on the Telegram servers.</param>
+        /// <param name="type">Type of file to send.</param>
         /// <param name="reply_markup">Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
+        /// <param name="caption">Photo caption (only use with Type.Photo).</param>
         /// <param name="reply_to_message_id">If the message is a reply, ID of the original message.</param>
         /// <returns></returns>
-        public Message ResendAudio(int chat_id, string audio_id, ForceReply reply_markup, int reply_to_message_id = -1)
+        public Message ResendMultimedia(int chat_id, string photo_id, MultimediaType type, ForceReply reply_markup, string caption = null, int reply_to_message_id = -1)
         {
-            string url = BaseUrl + "sendPhoto?chat_id=" + chat_id + "&audio=" + audio_id;
+            string url = BaseUrl + "send" + type.ToString() + "?chat_id=" + chat_id + "&" + type.ToString().ToLower() + "=" + photo_id;
+            if (!string.IsNullOrEmpty(caption) && type == MultimediaType.Photo)
+                url += "&caption=" + caption;
             if (reply_to_message_id != -1)
                 url += "&reply_to_message_id=" + reply_to_message_id;
             if (reply_markup != null)
@@ -726,6 +1007,7 @@ namespace TelegramBotsAPI
             var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
             return ParseResponseMessage(responseString);
         }
+        #endregion
 
         private Message ParseResponseMessage(string response)
         {
