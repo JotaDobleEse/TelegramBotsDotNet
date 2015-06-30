@@ -1162,6 +1162,63 @@ namespace TelegramBotsAPI
             return null;
         }
 
+        /// <summary>
+        /// Use this method to receive incoming updates using long polling. An Array of Update objects is returned.
+        /// </summary>
+        /// <param name="offset">Identifier of the first update to be returned. Must be greater by one than the highest among the identifiers of previously received updates. By default, updates starting with the earliest unconfirmed update are returned. An update is considered confirmed as soon as getUpdates is called with an offset higher than its update_id.</param>
+        /// <param name="limit">Limits the number of updates to be retrieved. Values between 1—100 are accepted. Defaults to 100.</param>
+        /// <param name="timeout">Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling.</param>
+        /// <returns></returns>
+        public Update[] GetUpdates(int offset = -1, int limit = 100, int timeout = 0)
+        {
+            if (limit > 100 || limit < 1)
+                throw new ArgumentOutOfRangeException("limit", limit, "limit value should be between 1 and 100");
+
+            string url = BaseUrl + "getUpdates";
+            if (offset != -1)
+                url += (url.Contains('?') ? "&offset=" : "?offset=") + offset;
+            if (limit != 100)
+                url += (url.Contains('?') ? "&limit=" : "?limit=") + limit;
+            if (timeout != 100)
+                url += (url.Contains('?') ? "&timeout=" : "?timeout=") + limit;
+
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "GET";
+
+            var response = (HttpWebResponse)request.GetResponse();
+            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            JObject json = JObject.Parse(responseString);
+            Console.WriteLine(json.ToString());
+            if (json.GetValue("ok").ToString().ToLower() == "true")
+            {
+                try
+                {
+                    var updates = JsonConvert.DeserializeObject<Update[]>(json.GetValue("result").ToString());
+                    return updates;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized Update. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
+        /// </summary>
+        /// <param name="url">HTTPS url to send updates to. Use an empty string to remove webhook integration. Ports currently supported for Webhooks: 443, 80, 88, 8443.</param>
+        public void SetWebhook(string url = "")
+        {
+            string call_url = BaseUrl + "setWebhook?url=" + url;
+
+            var request = (HttpWebRequest)WebRequest.Create(call_url);
+            request.Method = "POST";
+
+            var response = (HttpWebResponse)request.GetResponse();
+            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+        }
+
         private Message ParseResponseMessage(string response)
         {
             JObject json = JObject.Parse(response);
